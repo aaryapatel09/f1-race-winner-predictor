@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -23,20 +22,66 @@ wheels/
 
 # Virtual Environment
 venv/
+env/
 ENV/
+.env
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+.DS_Store
 
 # Project specific
-.env
-data/*.csv
-models/*.pkl
+data/
+models/
+logs/
 *.log
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# OS specific
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Monitoring
+prometheus/data/
+grafana/data/
+alertmanager/data/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Local development
+*.sqlite3
+*.db
+.env.local
+.env.*.local
+
+# Distribution
+dist/
+build/
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Documentation
+docs/_build/
+site/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# System Files
 .DS_Store
 Thumbs.db 
