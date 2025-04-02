@@ -1,149 +1,67 @@
-# F1 Predictor
+# F1 Race Winner Predictor 🏎️
 
-A machine learning application for predicting Formula 1 race outcomes using historical data and advanced analytics.
+Want to predict F1 race winners? Just run this app!
 
-## Features
+## Quick Start 🚀
 
-- Data collection from F1 API and historical databases
-- Advanced machine learning models for race outcome prediction
-- Real-time race monitoring and predictions
-- Web interface for visualization and interaction
-- Comprehensive monitoring and alerting system
-- Automated deployment to cloud platforms
-- Development tools and quality checks
+1. Download this repository (click the green "Code" button and download ZIP)
+2. Open the downloaded folder
+3. Run the test script to check everything:
+   ```bash
+   python test.py
+   ```
+4. If tests pass, run the app:
+   ```bash
+   python run.py
+   ```
+   The app will open in your web browser automatically!
 
-## Prerequisites
+## Testing 🧪
 
-- Python 3.9 or higher
-- Docker and Docker Compose
-- Git
-- Cloud provider account (AWS or GCP) for deployment
+To test if everything is working:
+1. Run `python test.py`
+2. The script will check:
+   - Python installation
+   - Required folders
+   - Dependencies
+   - Application setup
+3. If any test fails, run `python run.py` to fix the setup
 
-## Installation
+## What You Get 🎁
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/f1-predictor.git
-cd f1-predictor
-```
+- Simple web interface to make predictions
+- See who might win the next race
+- View cool race statistics
+- Real-time race monitoring
+- Automatic data updates
+- Cloud deployment options (AWS/GCP)
 
-2. Set up the development environment:
-```bash
-python scripts/init_dev.py
-```
+## Cloud Features ☁️
 
-3. Update the environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+Want to deploy to the cloud? We support:
+- AWS (EC2, S3, CloudWatch)
+- Google Cloud Platform
+- Automatic scaling
+- Real-time monitoring
 
-4. Activate the virtual environment:
-```bash
-# On Unix/macOS:
-source venv/bin/activate
-# On Windows:
-.\venv\Scripts\activate
-```
+See [cloud setup guide](docs/cloud_setup.md) for details.
 
-5. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## Need Help? 💬
 
-## Development
+If something doesn't work:
+1. Run `python test.py` to check what's wrong
+2. Make sure you have Python installed (download from [python.org](https://python.org))
+3. Try running `python run.py` again
+4. If you still have issues, open an issue on GitHub
 
-1. Start the development environment:
-```bash
-python scripts/manage.py start
-```
+## For Developers 👨‍💻
 
-2. Run tests:
-```bash
-pytest
-```
+Check out our [developer guide](docs/developer_guide.md) for:
+- Setting up the development environment
+- Running tests
+- Contributing to the project
+- Cloud deployment options
 
-3. Check code quality:
-```bash
-flake8
-black .
-isort .
-mypy .
-```
+## License 📄
 
-4. View logs:
-```bash
-python scripts/manage.py logs -f
-```
-
-## Deployment
-
-1. Set up cloud provider credentials:
-```bash
-# For AWS:
-aws configure
-# For GCP:
-gcloud auth application-default login
-```
-
-2. Deploy to cloud:
-```bash
-python scripts/deploy.py
-```
-
-## Monitoring
-
-The application includes comprehensive monitoring:
-
-- Prometheus for metrics collection
-- Grafana for visualization
-- Alertmanager for notifications
-- Custom dashboards for F1-specific metrics
-
-Access monitoring dashboards:
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000
-
-## Project Structure
-
-```
-f1-predictor/
-├── data/               # Data storage
-├── models/            # Trained models
-├── logs/              # Application logs
-├── scripts/           # Management scripts
-├── tests/             # Test suite
-├── docs/              # Documentation
-├── prometheus/        # Prometheus configuration
-├── grafana/           # Grafana configuration
-├── alertmanager/      # Alertmanager configuration
-└── f1_predictor/      # Main application package
-    ├── api/           # API endpoints
-    ├── core/          # Core functionality
-    ├── data/          # Data collection
-    ├── ml/            # Machine learning models
-    ├── utils/         # Utility functions
-    └── web/           # Web interface
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Formula 1 for providing the API
-- Contributors and maintainers
-- Open source community
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers. 
+MIT License - feel free to use this however you want! 

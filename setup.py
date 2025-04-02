@@ -1,41 +1,28 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
-with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
-
 setup(
     name="f1-predictor",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="A machine learning application for predicting Formula 1 race outcomes",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/f1-predictor",
     packages=find_packages(),
-    classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Topic :: Software Development :: Libraries :: Python Modules",
+    install_requires=[
+        "pandas>=1.5.0",
+        "numpy>=1.21.0",
+        "scikit-learn>=1.0.0",
+        "requests>=2.26.0",
+        "streamlit>=1.15.0",
+        "plotly>=5.3.0",
+        "python-dotenv>=0.19.0",
+        "fastapi>=0.68.0",
+        "uvicorn>=0.15.0",
+        "boto3>=1.26.0",  # AWS SDK
+        "google-cloud-storage>=2.0.0",  # GCP Storage
+        "prometheus-client>=0.12.0",  # Monitoring
+        "python-json-logger>=2.0.0",  # Logging
     ],
-    python_requires=">=3.9",
-    install_requires=requirements,
+    python_requires=">=3.8",
     entry_points={
         "console_scripts": [
-            "f1-predictor=f1_predictor.cli:main",
+            "f1-predictor=src.main:main",
         ],
     },
-    include_package_data=True,
-    package_data={
-        "f1_predictor": ["data/*", "models/*", "config/*"],
-    },
-    zip_safe=False,
 ) 
