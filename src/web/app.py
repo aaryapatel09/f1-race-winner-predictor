@@ -8,7 +8,6 @@ def main():
     
     st.sidebar.header("Settings")
     
-    # Placeholder for data loading
     if 'data' not in st.session_state:
         st.session_state.data = pd.DataFrame({
             'track': ['Monaco', 'Silverstone', 'Monza'],
@@ -16,11 +15,9 @@ def main():
             'predicted_winner': ['Max Verstappen', 'Lewis Hamilton', 'Charles Leclerc']
         })
     
-    # Display predictions
     st.header("Latest Predictions")
     st.dataframe(st.session_state.data)
     
-    # Add prediction form
     st.header("Make a New Prediction")
     track = st.selectbox("Select Track", ['Monaco', 'Silverstone', 'Monza'])
     date = st.date_input("Race Date")

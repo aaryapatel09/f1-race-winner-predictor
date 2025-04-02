@@ -2,86 +2,91 @@
 import os
 import sys
 import subprocess
-from pathlib import Path
+import importlib.util
+import pkg_resources
 
-def test_setup():
-    """Test if the basic setup works."""
-    print("🔍 Testing setup...")
-    
-    # Check Python version
-    print("✓ Python version:", sys.version.split()[0])
-    
-    # Check virtual environment
-    venv_path = Path("venv")
-    if venv_path.exists():
-        print("✓ Virtual environment exists")
-    else:
-        print("❌ Virtual environment missing")
-        return False
-    
-    # Check required folders
-    folders = ["data", "models", "logs"]
-    for folder in folders:
-        if os.path.exists(folder):
-            print(f"✓ {folder} folder exists")
-        else:
-            print(f"❌ {folder} folder missing")
-            return False
-    
-    return True
+def check_python_version():
+    version = sys.version_info
+    return version.major >= 3 and version.minor >= 7
 
-def test_dependencies():
-    """Test if all required packages are installed."""
-    print("\n🔍 Testing dependencies...")
+def check_virtual_env():
+    return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
+
+def check_directories():
+    required_dirs = ['data', 'models', 'logs']
+    return all(os.path.exists(dir) for dir in required_dirs)
+
+def check_dependencies():
+    required_packages = ['pandas', 'numpy', 'scikit-learn', 'flask', 'streamlit']
+    missing_packages = []
+    
+    for package in required_packages:
+        try:
+            pkg_resources.require(package)
+        except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict):
+            missing_packages.append(package)
+    
+    return missing_packages
+
+def check_app_import():
     try:
-        import pandas
-        import numpy
-        import sklearn
-        import streamlit
-        import plotly
-        print("✓ All basic packages installed")
-        
-        # Test cloud packages if .env exists
-        if os.path.exists(".env"):
-            import boto3
-            import google.cloud
-            import prometheus_client
-            print("✓ Cloud packages installed")
-        
-        return True
-    except ImportError as e:
-        print(f"❌ Missing package: {str(e)}")
-        return False
-
-def test_app():
-    """Test if the app can start."""
-    print("\n🔍 Testing application...")
-    try:
-        # Try to import the app
-        from src.web import app
-        print("✓ App imports successfully")
-        return True
+        spec = importlib.util.spec_from_file_location("app", "src/web/app.py")
+        if spec and spec.loader:
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return True
     except Exception as e:
         print(f"❌ App import failed: {str(e)}")
-        return False
+    return False
 
 def main():
-    """Run all tests."""
     print("🧪 Starting F1 Predictor Tests\n")
     
-    setup_ok = test_setup()
-    deps_ok = test_dependencies()
-    app_ok = test_app()
+    print("🔍 Testing setup...")
+    setup_ok = True
+    
+    if check_python_version():
+        print("✓ Python version:", sys.version.split()[0])
+    else:
+        print("❌ Python version too old")
+        setup_ok = False
+    
+    if check_virtual_env():
+        print("✓ Virtual environment exists")
+    else:
+        print("❌ No virtual environment found")
+        setup_ok = False
+    
+    if check_directories():
+        print("✓ data folder exists")
+        print("✓ models folder exists")
+        print("✓ logs folder exists")
+    else:
+        print("❌ Missing required directories")
+        setup_ok = False
+    
+    print("\n🔍 Testing dependencies...")
+    missing_packages = check_dependencies()
+    if missing_packages:
+        print("❌ Missing packages:", ", ".join(missing_packages))
+    else:
+        print("✓ All dependencies installed")
+    
+    print("\n🔍 Testing application...")
+    if check_app_import():
+        print("✓ App imports successfully")
+    else:
+        print("❌ App import failed")
     
     print("\n📊 Test Results:")
     print(f"Setup: {'✓' if setup_ok else '❌'}")
-    print(f"Dependencies: {'✓' if deps_ok else '❌'}")
-    print(f"Application: {'✓' if app_ok else '❌'}")
+    print(f"Dependencies: {'✓' if not missing_packages else '❌'}")
+    print(f"Application: {'✓' if check_app_import() else '❌'}")
     
-    if setup_ok and deps_ok and app_ok:
-        print("\n✨ All tests passed! You can run the app with: python run.py")
-    else:
+    if not setup_ok or missing_packages or not check_app_import():
         print("\n❌ Some tests failed. Please run: python run.py to fix setup")
+    else:
+        print("\n✨ All tests passed! You can run the app with: streamlit run src/web/app.py")
 
 if __name__ == "__main__":
     main() 
