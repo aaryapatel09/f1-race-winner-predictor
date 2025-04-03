@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>f1 race winner predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* make it look nice n stuff */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #e10600;  /* f1 red */
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #e10600;
+            border-color: #e10600;
+        }
+        .btn-primary:hover {
+            background-color: #b30500;
+            border-color: #b30500;
+        }
+        .prediction-card {
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .prediction-card:hover {
+            transform: translateY(-5px);
+        }
+        .driver-name {
+            font-weight: bold;
+            color: #e10600;
+        }
+        .probability {
+            font-size: 1.2em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1>f1 race winner predictor</h1>
+            </div>
+            <div class="card-body">
+                <form id="predictionForm">
+                    <div class="mb-3">
+                        <label for="track" class="form-label">pick a track:</label>
+                        <select class="form-select" id="track" name="track" required>
+                            <option value="">choose a track...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">when's the race?</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">predict winner</button>
+                    </div>
+                </form>
+                
+                <div id="predictions" class="mt-4">
+                    <!-- predictions will show up here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // get list of tracks when page loads
+        fetch('/tracks')
+            .then(response => response.json())
+            .then(data => {
+                const trackSelect = document.getElementById('track');
+                data.tracks.forEach(track => {
+                    const option = document.createElement('option');
+                    option.value = track;
+                    option.textContent = track;
+                    trackSelect.appendChild(option);
+                });
+            });
+
+        // handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const track = document.getElementById('track').value;
+            const date = document.getElementById('date').value;
+            
+            // show loading state
+            const predictionsDiv = document.getElementById('predictions');
+            predictionsDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+            
+            // get predictions
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ track, date })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // show predictions
+                let html = '<h3 class="text-center mb-4">top 3 most likely winners:</h3>';
+                data.predictions.forEach((pred, index) => {
+                    html += `
+                        <div class="card prediction-card">
+                            <div class="card-body">
+                                <h5 class="card-title">#${index + 1} - <span class="driver-name">${pred.driver}</span></h5>
+                                <p class="card-text probability">${pred.probability}% chance to win</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                predictionsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                predictionsDiv.innerHTML = '<div class="alert alert-danger">oops something went wrong, try again</div>';
+            });
+        });
+    </script>
+</body>
+</html> 
