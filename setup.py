@@ -5,24 +5,22 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "pandas>=1.5.0",
-        "numpy>=1.21.0",
-        "scikit-learn>=1.0.0",
-        "requests>=2.26.0",
-        "streamlit>=1.15.0",
-        "plotly>=5.3.0",
-        "python-dotenv>=0.19.0",
-        "fastapi>=0.68.0",
-        "uvicorn>=0.15.0",
-        "boto3>=1.26.0",  # AWS SDK
-        "google-cloud-storage>=2.0.0",  # GCP Storage
-        "prometheus-client>=0.12.0",  # Monitoring
-        "python-json-logger>=2.0.0",  # Logging
+        "streamlit==1.12.0",
+        "pandas",
+        "numpy",
+        "scikit-learn",
+        "plotly",
+        "altair==4.2.2",
+        "joblib"
     ],
-    python_requires=">=3.8",
-    entry_points={
-        "console_scripts": [
-            "f1-predictor=src.main:main",
-        ],
-    },
+    author="Aarya Patel",
+    author_email="aaryapatel09@gmail.com",
+    description="F1 Race Winner Predictor using machine learning",
+    keywords="f1, formula 1, racing, prediction, machine learning",
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Sports Fans",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+    ],
 ) 
