@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - CLOUD_PROVIDER=${CLOUD_PROVIDER}
+      - PROJECT_ID=${PROJECT_ID}
+      - REGION=${REGION}
+      - INSTANCE_TYPE=${INSTANCE_TYPE}
+    depends_on:
+      - redis
+      - prometheus
+    networks:
+      - f1-network
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - f1-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - f1-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - f1-network
+
+  data-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m scripts.collect_data
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - CLOUD_PROVIDER=${CLOUD_PROVIDER}
+      - PROJECT_ID=${PROJECT_ID}
+      - REGION=${REGION}
+      - INSTANCE_TYPE=${INSTANCE_TYPE}
+    depends_on:
+      - redis
+    networks:
+      - f1-network
+
+  model-trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m scripts.train_model
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    environment:
+      - CLOUD_PROVIDER=${CLOUD_PROVIDER}
+      - PROJECT_ID=${PROJECT_ID}
+      - REGION=${REGION}
+      - INSTANCE_TYPE=${INSTANCE_TYPE}
+    depends_on:
+      - redis
+    networks:
+      - f1-network
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  f1-network:
+    driver: bridge 
