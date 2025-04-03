@@ -19,4 +19,6 @@ tweepy>=4.12.0
 docker>=6.1.0
 google-cloud-aiplatform>=1.25.0
 boto3>=1.26.0
-seaborn>=0.11.0 
+seaborn>=0.11.0
+altair==4.1.0
+streamlit>=1.22.0 
