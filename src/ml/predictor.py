@@ -197,129 +197,131 @@ class F1Predictor:
             }
     
     def fetch_car_performance_data(self):
-        """get info about how fast each car is"""
-        # get current cars
-        cars = self.f1_api.get_current_cars()
-        
-        # setup car stats
-        for car_name, car_info in cars.items():
-            # calc car stats
-            self.car_performance_data[car_name] = {
-                'aero_efficiency': car_info.get('aero_efficiency', 0.5),
-                'power_unit_reliability': car_info.get('power_unit_reliability', 0.5),
-                'tire_management': car_info.get('tire_management', 0.5),
-                'downforce_level': car_info.get('downforce_level', 0.5),
-                'car_development': car_info.get('car_development', 0.5),
-                'race_pace': car_info.get('race_pace', 0.5),
-                'qualifying_pace': car_info.get('qualifying_pace', 0.5),
-                'reliability': car_info.get('reliability', 0.5)
-            }
-        
-        # if api fails use this data instead
-        if not self.car_performance_data:
-            # updated car performance data to reflect mclaren's strong performance
-            self.car_performance_data = {
-                'Red Bull Racing': {
-                    'aero_efficiency': 0.85,
-                    'power_unit_reliability': 0.9,
-                    'tire_management': 0.8,
-                    'downforce_level': 0.85,
-                    'car_development': 0.8,
-                    'race_pace': 0.85,
-                    'qualifying_pace': 0.8,
-                    'reliability': 0.9
-                },
-                'Mercedes': {
-                    'aero_efficiency': 0.8,
-                    'power_unit_reliability': 0.85,
-                    'tire_management': 0.75,
-                    'downforce_level': 0.8,
-                    'car_development': 0.75,
-                    'race_pace': 0.8,
-                    'qualifying_pace': 0.75,
-                    'reliability': 0.85
-                },
-                'Ferrari': {
-                    'aero_efficiency': 0.75,
-                    'power_unit_reliability': 0.8,
-                    'tire_management': 0.7,
-                    'downforce_level': 0.75,
-                    'car_development': 0.7,
-                    'race_pace': 0.75,
-                    'qualifying_pace': 0.7,
-                    'reliability': 0.8
-                },
-                'McLaren': {
-                    'aero_efficiency': 0.9,  # improved from 0.85
-                    'power_unit_reliability': 0.95,  # improved from 0.9
-                    'tire_management': 0.85,  # improved from 0.8
-                    'downforce_level': 0.9,  # improved from 0.85
-                    'car_development': 0.85,  # improved from 0.8
-                    'race_pace': 0.9,  # improved from 0.85
-                    'qualifying_pace': 0.85,  # improved from 0.8
-                    'reliability': 0.95  # improved from 0.9
-                },
-                'Aston Martin': {
-                    'aero_efficiency': 0.7,
-                    'power_unit_reliability': 0.75,
-                    'tire_management': 0.65,
-                    'downforce_level': 0.7,
-                    'car_development': 0.65,
-                    'race_pace': 0.7,
-                    'qualifying_pace': 0.65,
-                    'reliability': 0.75
-                },
-                'Alpine': {
-                    'aero_efficiency': 0.65,
-                    'power_unit_reliability': 0.7,
-                    'tire_management': 0.6,
-                    'downforce_level': 0.65,
-                    'car_development': 0.6,
-                    'race_pace': 0.65,
-                    'qualifying_pace': 0.6,
-                    'reliability': 0.7
-                },
-                'Williams': {
-                    'aero_efficiency': 0.6,
-                    'power_unit_reliability': 0.65,
-                    'tire_management': 0.55,
-                    'downforce_level': 0.6,
-                    'car_development': 0.55,
-                    'race_pace': 0.6,
-                    'qualifying_pace': 0.55,
-                    'reliability': 0.65
-                },
-                'Visa Cash App RB': {
-                    'aero_efficiency': 0.55,
-                    'power_unit_reliability': 0.6,
-                    'tire_management': 0.5,
-                    'downforce_level': 0.55,
-                    'car_development': 0.5,
-                    'race_pace': 0.55,
-                    'qualifying_pace': 0.5,
-                    'reliability': 0.6
-                },
-                'Stake F1 Team': {
-                    'aero_efficiency': 0.5,
-                    'power_unit_reliability': 0.55,
-                    'tire_management': 0.45,
-                    'downforce_level': 0.5,
-                    'car_development': 0.45,
-                    'race_pace': 0.5,
-                    'qualifying_pace': 0.45,
-                    'reliability': 0.55
-                },
-                'Haas F1 Team': {
-                    'aero_efficiency': 0.45,
-                    'power_unit_reliability': 0.5,
-                    'tire_management': 0.4,
-                    'downforce_level': 0.45,
-                    'car_development': 0.4,
-                    'race_pace': 0.45,
-                    'qualifying_pace': 0.4,
-                    'reliability': 0.5
+        """get info about how fast each car is rn"""
+        try:
+            cars = self.f1_api.fetch_car_performance_data()
+            
+            # setup car stats
+            for car_name, car_info in cars.items():
+                # calc car stats
+                self.car_performance_data[car_name] = {
+                    'aero_efficiency': car_info.get('aero_efficiency', 0.5),
+                    'power_unit_reliability': car_info.get('power_unit_reliability', 0.5),
+                    'tire_management': car_info.get('tire_management', 0.5),
+                    'downforce_level': car_info.get('downforce_level', 0.5),
+                    'car_development': car_info.get('car_development', 0.5),
+                    'race_pace': car_info.get('race_pace', 0.5),
+                    'qualifying_pace': car_info.get('qualifying_pace', 0.5),
+                    'reliability': car_info.get('reliability', 0.5)
                 }
-            }
+            
+            # if api fails use this data instead
+            if not self.car_performance_data:
+                # updated car performance data to reflect mclaren's strong performance
+                self.car_performance_data = {
+                    'Red Bull Racing': {
+                        'aero_efficiency': 0.85,
+                        'power_unit_reliability': 0.9,
+                        'tire_management': 0.8,
+                        'downforce_level': 0.85,
+                        'car_development': 0.8,
+                        'race_pace': 0.85,
+                        'qualifying_pace': 0.8,
+                        'reliability': 0.9
+                    },
+                    'Mercedes': {
+                        'aero_efficiency': 0.8,
+                        'power_unit_reliability': 0.85,
+                        'tire_management': 0.75,
+                        'downforce_level': 0.8,
+                        'car_development': 0.75,
+                        'race_pace': 0.8,
+                        'qualifying_pace': 0.75,
+                        'reliability': 0.85
+                    },
+                    'Ferrari': {
+                        'aero_efficiency': 0.75,
+                        'power_unit_reliability': 0.8,
+                        'tire_management': 0.7,
+                        'downforce_level': 0.75,
+                        'car_development': 0.7,
+                        'race_pace': 0.75,
+                        'qualifying_pace': 0.7,
+                        'reliability': 0.8
+                    },
+                    'McLaren': {
+                        'aero_efficiency': 0.9,  # improved from 0.85
+                        'power_unit_reliability': 0.95,  # improved from 0.9
+                        'tire_management': 0.85,  # improved from 0.8
+                        'downforce_level': 0.9,  # improved from 0.85
+                        'car_development': 0.85,  # improved from 0.8
+                        'race_pace': 0.9,  # improved from 0.85
+                        'qualifying_pace': 0.85,  # improved from 0.8
+                        'reliability': 0.95  # improved from 0.9
+                    },
+                    'Aston Martin': {
+                        'aero_efficiency': 0.7,
+                        'power_unit_reliability': 0.75,
+                        'tire_management': 0.65,
+                        'downforce_level': 0.7,
+                        'car_development': 0.65,
+                        'race_pace': 0.7,
+                        'qualifying_pace': 0.65,
+                        'reliability': 0.75
+                    },
+                    'Alpine': {
+                        'aero_efficiency': 0.65,
+                        'power_unit_reliability': 0.7,
+                        'tire_management': 0.6,
+                        'downforce_level': 0.65,
+                        'car_development': 0.6,
+                        'race_pace': 0.65,
+                        'qualifying_pace': 0.6,
+                        'reliability': 0.7
+                    },
+                    'Williams': {
+                        'aero_efficiency': 0.6,
+                        'power_unit_reliability': 0.65,
+                        'tire_management': 0.55,
+                        'downforce_level': 0.6,
+                        'car_development': 0.55,
+                        'race_pace': 0.6,
+                        'qualifying_pace': 0.55,
+                        'reliability': 0.65
+                    },
+                    'Visa Cash App RB': {
+                        'aero_efficiency': 0.55,
+                        'power_unit_reliability': 0.6,
+                        'tire_management': 0.5,
+                        'downforce_level': 0.55,
+                        'car_development': 0.5,
+                        'race_pace': 0.55,
+                        'qualifying_pace': 0.5,
+                        'reliability': 0.6
+                    },
+                    'Stake F1 Team': {
+                        'aero_efficiency': 0.5,
+                        'power_unit_reliability': 0.55,
+                        'tire_management': 0.45,
+                        'downforce_level': 0.5,
+                        'car_development': 0.45,
+                        'race_pace': 0.5,
+                        'qualifying_pace': 0.45,
+                        'reliability': 0.55
+                    },
+                    'Haas F1 Team': {
+                        'aero_efficiency': 0.45,
+                        'power_unit_reliability': 0.5,
+                        'tire_management': 0.4,
+                        'downforce_level': 0.45,
+                        'car_development': 0.4,
+                        'race_pace': 0.45,
+                        'qualifying_pace': 0.4,
+                        'reliability': 0.5
+                    }
+                }
+        except Exception as e:
+            print(f"Error fetching car performance data: {e}")
     
     def fetch_track_characteristics(self):
         """get info about each track"""
