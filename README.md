@@ -1,72 +1,37 @@
-# F1 Race Winner Predictor 🏎️
+# F1 Race Winner Predictor
 
-Predict Formula 1 race winners using machine learning! This app analyzes historical data, driver performance, and track conditions to make predictions.
+Streamlit app that predicts Formula 1 race winners from driver form, constructor, circuit history, and grid position. Trained on ~6 seasons of race results from the [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/) (the maintained drop-in replacement for the retired Ergast service).
 
-## Features 🌟
+## Run
 
-- Race winner predictions
-- Driver performance analysis
-- Track-specific insights
-- Interactive web interface
-- Real-time data updates
-
-## Quick Start 🚀
-
-1. Clone the repository:
-```bash
-git clone https://github.com/aaryapatel09/f1-race-winner-predictor.git
-cd f1-race-winner-predictor
-```
-
-2. Set up Python environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
 ```bash
 pip install -r requirements.txt
+streamlit run app.py
 ```
 
-4. Run the app:
-```bash
-streamlit run src/web/app.py
-```
+First launch fetches 2019–2024 results from Jolpica (~1 min) and trains a gradient-boosted classifier. Both the CSV and the trained model cache to `data/`, so subsequent starts are instant.
 
-## Cloud Features ☁️
+## Model
 
-Want to deploy to the cloud? We support:
+- **Target:** `position == 1` (binary win/no-win per driver-race)
+- **Features:**
+  - `grid` — starting grid position
+  - `driver_form_5` — mean finishing position over the driver's last 5 races
+  - `driver_career_winrate` — expanding win rate (leakage-free, shifted by one)
+  - `constructor_recent_winrate` — 20-race rolling win rate for the team
+  - `circuit_mean_winner_grid` — at this circuit, what grid slot do winners typically come from
+  - `driver_constructor_age` — how many races the driver has run with this team
+- **Classifier:** sklearn `HistGradientBoostingClassifier`, `max_iter=300`, `max_depth=4`, per-sample weights rebalance the ~1:19 win/no-win ratio
+- **Evaluation:** 80/20 stratified split; on 2021–2024 data the test ROC-AUC is **0.954**
 
-- AWS (EC2, S3, CloudWatch)
-- Google Cloud Platform
-- Automatic scaling
-- Real-time monitoring
+All features are strictly pre-race: rolling/expanding windows are shifted by one step so no label information leaks in.
 
-See our [Cloud Setup Guide](docs/cloud_setup.md) for detailed instructions.
+## UI
 
-## Need Help? 💬
+- **Single prediction** — pick a driver, team, circuit, and grid slot, get a win probability
+- **Simulate a race** — pick a circuit and starting order, get normalised win probabilities across the grid
+- **Data** — browse the last 100 rows of the fetched dataset
 
-If something doesn't work:
+## Why the rewrite
 
-1. Run `python test.py` to check what's wrong
-2. Make sure you have Python installed (download from python.org)
-3. Try running `python run.py` again
-4. If you still have issues, open an issue on GitHub
-
-## For Developers 👨‍💻
-
-Check out our [Developer Guide](docs/developer_guide.md) for:
-
-- Setting up the development environment
-- Running tests
-- Contributing to the project
-- Cloud deployment options
-
-## Contributing 🤝
-
-We welcome contributions! Please see our [Developer Guide](docs/developer_guide.md) for contribution guidelines.
-
-## License 📄
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+The previous repo had two parallel frameworks (FastAPI `main.py` + Streamlit `src/web/app.py`), three duplicated predictor classes (`predictor.py`, `model.py`, `ensemble_model.py`), an `sklearn.neural_networks` typo that prevented import, training targets of raw finish position (1–20) being fed to classifiers, and a scraper pointed at Ergast — which went offline in 2024. This collapse is a single Streamlit app hitting the live Jolpica replacement API.
