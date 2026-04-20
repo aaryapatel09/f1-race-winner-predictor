@@ -1,7 +1,8 @@
 """F1 Race Winner Predictor — Streamlit UI.
 
-First run fetches 6 seasons of F1 results from the Jolpica API (~1 minute) and
-trains an XGBoost model. Subsequent runs load from the cache.
+First run fetches F1 race results from the Jolpica API (~1 minute for six
+seasons) and trains a gradient-boosted classifier. Subsequent runs load from
+the cache in ``data/``.
 """
 from __future__ import annotations
 
@@ -26,12 +27,22 @@ def _model():
     return mlmodel.load_or_train(_data())
 
 
-df = _data()
-clf, meta = _model()
-
 st.title("🏎️ F1 Race Winner Predictor")
+
+try:
+    df = _data()
+    clf, meta = _model()
+except Exception as e:
+    st.error(
+        "Could not fetch training data from the Jolpica F1 API. Check your "
+        "network connection and try again — the first run needs internet "
+        f"access. Raw error: `{e}`"
+    )
+    st.stop()
+
+year_lo, year_hi = int(df["season"].min()), int(df["season"].max())
 st.caption(
-    f"Trained on {len(df):,} driver-race rows from {SEASONS.start}–{SEASONS.stop - 1}, "
+    f"Trained on {len(df):,} driver-race rows from {year_lo}–{year_hi}, "
     "sourced from the [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/) (the maintained Ergast replacement)."
 )
 
@@ -84,9 +95,13 @@ with tab2:
             rows.append({"Grid": pos, "Driver": meta["driver_names"].get(d, d), "Constructor": team, "raw_p": p})
         sim = pd.DataFrame(rows)
         total = sim["raw_p"].sum() or 1.0
-        sim["P(win)"] = (sim["raw_p"] / total).map(lambda v: f"{v * 100:.1f}%")
+        sim["norm_p"] = sim["raw_p"] / total
+        # Sort on the numeric probability, THEN format for display — sorting on
+        # the formatted string column would be lexicographic ("9.9%" > "12.5%").
+        sim = sim.sort_values("norm_p", ascending=False).reset_index(drop=True)
+        sim["P(win)"] = sim["norm_p"].map(lambda v: f"{v * 100:.1f}%")
         st.dataframe(
-            sim.drop(columns=["raw_p"]).sort_values("P(win)", ascending=False).reset_index(drop=True),
+            sim.drop(columns=["raw_p", "norm_p"]),
             use_container_width=True,
         )
 
