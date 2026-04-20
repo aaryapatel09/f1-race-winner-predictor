@@ -12,6 +12,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.inspection import permutation_importance
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
@@ -101,6 +102,18 @@ def train(df: pd.DataFrame) -> dict:
     clf.fit(X_tr, y_tr, sample_weight=sample_weight)
     auc = roc_auc_score(y_te, clf.predict_proba(X_te)[:, 1])
 
+    # Permutation importance on the held-out test fold: how much does each
+    # feature's contribution to ROC-AUC drop when that column is shuffled?
+    # Averaged over 10 permutations. Using the test fold avoids giving credit
+    # for features the model merely memorised on the train fold.
+    imp = permutation_importance(
+        clf, X_te, y_te, n_repeats=10, random_state=42, scoring="roc_auc", n_jobs=-1
+    )
+    importance = {
+        f: {"mean": float(m), "std": float(s)}
+        for f, m, s in zip(FEATURES, imp.importances_mean, imp.importances_std)
+    }
+
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     joblib.dump(clf, MODEL_PATH)
 
@@ -111,6 +124,8 @@ def train(df: pd.DataFrame) -> dict:
         "circuit_mean_winner_grid": feats.groupby("circuit_id")["circuit_mean_winner_grid"].last().to_dict(),
         "driver_constructor_age": feats.groupby(["driver_id", "constructor_id"])["driver_constructor_age"].last().to_dict(),
         "driver_names": dict(zip(feats["driver_id"], feats["driver_name"])),
+        "feature_importance": importance,
+        "test_auc": float(auc),
     }
     joblib.dump(meta, META_PATH)
 
